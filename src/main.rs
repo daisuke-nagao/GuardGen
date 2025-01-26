@@ -7,7 +7,7 @@
  use std::env;
 use std::fs;
 use std::fs::OpenOptions;
-use std::io::{self, Write};
+use std::io::{Write};
 
 fn generate_guard() -> String {
     let uuid = uuid7::uuid7();
