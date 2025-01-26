@@ -10,7 +10,7 @@ use std::fs::OpenOptions;
 use std::io::Write;
 
 fn generate_guard() -> String {
-    let uuid = uuid7::uuid7().to_string().replace('-', "_");
+    let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
     format!(
         "#ifndef UUID_{}
 #define UUID_{}
