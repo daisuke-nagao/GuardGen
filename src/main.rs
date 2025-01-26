@@ -4,22 +4,20 @@
  * SPDX-License-Identifier: MIT
  */
 
- use std::env;
+use std::env;
 use std::fs;
 use std::fs::OpenOptions;
-use std::io::{Write};
+use std::io::Write;
 
 fn generate_guard() -> String {
-    let uuid = uuid7::uuid7();
+    let uuid = uuid7::uuid7().to_string().replace('-', "_");
     format!(
         "#ifndef UUID_{}
 #define UUID_{}
 
 
 #endif /* UUID_{} */",
-        uuid.to_string().replace('-', "_"),
-        uuid.to_string().replace('-', "_"),
-        uuid.to_string().replace('-', "_")
+        uuid, uuid, uuid
     )
 }
 
