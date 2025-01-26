@@ -2,6 +2,7 @@
 name = "guardgen"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE"
 
 [dependencies]
 uuid7 = "1.1.0"
