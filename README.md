@@ -24,7 +24,7 @@ GuardGen is a Rust-based command-line tool designed to generate unique header gu
 1. Ensure you have [Rust](https://www.rust-lang.org/) installed on your system.
 2. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/daisuke-nagao/GuardGen.git
    cd guardgen
    ```
 3. Build the project:
