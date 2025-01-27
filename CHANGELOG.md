@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Introduced `--prefix` option for customizing the prefix of the include guard (default: `"UUID"`).
 - Introduced `--suffix` option for appending a suffix to the include guard (default: none).
 - Supported combining `--prefix` and `--suffix` for full customization.
+- Introduced `-x` option to specify the target language for include guard generation.
+  - Supported values: `none` (default), `c`, and `cxx`.
+  - Added `extern "C" {}` block when targeting C with `-x c`.
 - Introduced the `clap` crate (version 4.5.27) for argument parsing.
   - Added `--output`/`-o` and `--overwrite` options with `clap`.
   - Enabled `derive` feature for `clap` in `Cargo.toml`.
@@ -25,4 +28,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Deprecated manual argument parsing using `std::env::args()` in favor of `clap`.
-
