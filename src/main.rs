@@ -16,6 +16,14 @@ enum Language {
     Cxx,
 }
 
+#[allow(clippy::upper_case_acronyms)]
+#[derive(Clone, Debug, ValueEnum)]
+enum LineEnding {
+    None,
+    LF,
+    CRLF,
+}
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -33,9 +41,17 @@ struct Args {
 
     #[arg(short, value_enum, default_value_t = Language::None, ignore_case = true)]
     x: Language,
+
+    #[arg(long="line-ending", value_enum, default_value_t = LineEnding::None, ignore_case=true)]
+    line_ending: LineEnding,
 }
 
-fn generate_guard(prefix: String, suffix: Option<String>, x: Language) -> String {
+fn generate_guard(
+    prefix: String,
+    suffix: Option<String>,
+    x: Language,
+    line_ending: LineEnding,
+) -> String {
     let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
     let mut guard = vec![prefix, uuid];
     if let Some(suffix) = suffix {
@@ -68,13 +84,26 @@ fn generate_guard(prefix: String, suffix: Option<String>, x: Language) -> String
     text.push(endif);
     text.push("".to_string());
 
-    text.join("\n")
+    let newline = match line_ending {
+        LineEnding::LF => "\n",
+        LineEnding::CRLF => "\r\n",
+        _ => {
+            if cfg!(target_os = "windows") {
+                "\r\n"
+            } else {
+                "\n"
+            }
+        }
+    }
+    .to_string();
+
+    text.join(&newline)
 }
 
 fn main() {
     let args = Args::parse();
 
-    let guard = generate_guard(args.prefix, args.suffix, args.x);
+    let guard = generate_guard(args.prefix, args.suffix, args.x, args.line_ending);
 
     if let Some(file_path) = &args.filename {
         if !args.overwrite && fs::metadata(file_path).is_ok() {

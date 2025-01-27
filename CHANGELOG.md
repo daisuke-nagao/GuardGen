@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Introduced `-x` option to specify the target language for include guard generation.
   - Supported values: `none` (default), `c`, and `cxx`.
   - Added `extern "C" {}` block when targeting C with `-x c`.
+- Introduced `--line-ending` option to control line endings in the generated output.
+  - Supported values: `LF`, `CRLF`, and `None` (default: system standard).
+  - Automatically detects and uses the appropriate line ending if `None` is specified.
 - Introduced the `clap` crate (version 4.5.27) for argument parsing.
   - Added `--output`/`-o` and `--overwrite` options with `clap`.
   - Enabled `derive` feature for `clap` in `Cargo.toml`.
