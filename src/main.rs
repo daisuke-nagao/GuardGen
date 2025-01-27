@@ -4,10 +4,17 @@
  * SPDX-License-Identifier: MIT
  */
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
+
+#[derive(Clone, Debug, ValueEnum)]
+enum Language {
+    None,
+    C,
+    Cxx,
+}
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -23,9 +30,12 @@ struct Args {
 
     #[arg(long = "suffix", default_value = None)]
     suffix: Option<String>,
+
+    #[arg(short, value_enum, default_value_t = Language::None, ignore_case = true)]
+    x: Language,
 }
 
-fn generate_guard(prefix: String, suffix: Option<String>) -> String {
+fn generate_guard(prefix: String, suffix: Option<String>, x: Language) -> String {
     let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
     let mut guard = vec![prefix, uuid];
     if let Some(suffix) = suffix {
@@ -40,6 +50,21 @@ fn generate_guard(prefix: String, suffix: Option<String>) -> String {
 
     let mut text = vec![ifndef, define];
 
+    if let Language::C = x {
+        let extern_c: Vec<String> = vec![
+            "".to_string(), // blank line
+            "#ifdef __cplusplus".to_string(),
+            "extern \"C\" {".to_string(),
+            "#endif /* __cplusplus */".to_string(),
+            "".to_string(), // blank line
+            "#ifdef __cplusplus".to_string(),
+            "} /* extern \"C\" */".to_string(),
+            "#endif /* __cplusplus */".to_string(),
+            "".to_string(), // blank line
+        ];
+        text.extend(extern_c);
+    }
+
     text.push(endif);
     text.push("".to_string());
 
@@ -49,7 +74,7 @@ fn generate_guard(prefix: String, suffix: Option<String>) -> String {
 fn main() {
     let args = Args::parse();
 
-    let guard = generate_guard(args.prefix, args.suffix);
+    let guard = generate_guard(args.prefix, args.suffix, args.x);
 
     if let Some(file_path) = &args.filename {
         if !args.overwrite && fs::metadata(file_path).is_ok() {
