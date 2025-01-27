@@ -17,24 +17,39 @@ struct Args {
 
     #[arg(long, default_value_t = false)]
     overwrite: bool,
+
+    #[arg(long = "prefix", default_value = "UUID")]
+    prefix: String,
+
+    #[arg(long = "suffix", default_value = None)]
+    suffix: Option<String>,
 }
 
-fn generate_guard() -> String {
+fn generate_guard(prefix: String, suffix: Option<String>) -> String {
     let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
-    format!(
-        "#ifndef UUID_{}
-#define UUID_{}
+    let mut guard = vec![prefix, uuid];
+    if let Some(suffix) = suffix {
+        guard.push(suffix);
+    }
 
+    let guard = guard.join("_");
 
-#endif /* UUID_{} */",
-        uuid, uuid, uuid
-    )
+    let ifndef = format!("#ifndef {}", guard);
+    let define = format!("#define {}", guard);
+    let endif = format!("#endif /* {} */", guard);
+
+    let mut text = vec![ifndef, define];
+
+    text.push(endif);
+    text.push("".to_string());
+
+    text.join("\n")
 }
 
 fn main() {
     let args = Args::parse();
 
-    let guard = generate_guard();
+    let guard = generate_guard(args.prefix, args.suffix);
 
     if let Some(file_path) = &args.filename {
         if !args.overwrite && fs::metadata(file_path).is_ok() {
