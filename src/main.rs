@@ -4,10 +4,20 @@
  * SPDX-License-Identifier: MIT
  */
 
-use std::env;
+use clap::Parser;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(short = 'o', long = "output")]
+    filename: Option<String>,
+
+    #[arg(long, default_value_t = false)]
+    overwrite: bool,
+}
 
 fn generate_guard() -> String {
     let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
@@ -22,35 +32,12 @@ fn generate_guard() -> String {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    // Parse arguments
-    let mut filename: Option<&str> = None;
-    let mut overwrite = false;
-
-    let mut args_iter = args.iter();
-    while let Some(arg) = args_iter.next() {
-        match arg.as_str() {
-            "--output" | "-o" => {
-                if let Some(file) = args_iter.next() {
-                    filename = Some(file);
-                } else {
-                    eprintln!("Error: Missing value for {}", arg);
-                    std::process::exit(1);
-                }
-            }
-            "--overwrite" => {
-                overwrite = true;
-            }
-            _ => {}
-        }
-    }
+    let args = Args::parse();
 
     let guard = generate_guard();
 
-    if let Some(file) = filename {
-        let file_path = file;
-        if !overwrite && fs::metadata(file_path).is_ok() {
+    if let Some(file_path) = &args.filename {
+        if !args.overwrite && fs::metadata(file_path).is_ok() {
             eprintln!(
                 "Error: File '{}' already exists. Use --overwrite to overwrite.",
                 file_path
@@ -61,7 +48,7 @@ fn main() {
         match OpenOptions::new()
             .write(true)
             .create(true)
-            .truncate(overwrite)
+            .truncate(args.overwrite)
             .open(file_path)
         {
             Ok(mut file) => {
