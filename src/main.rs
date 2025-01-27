@@ -16,6 +16,7 @@ enum Language {
     Cxx,
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Clone, Debug, ValueEnum)]
 enum LineEnding {
     None,
