@@ -154,6 +154,7 @@ fn main() {
             std::process::exit(1);
         }
 
+        // Attempt to open the file for writing.
         match OpenOptions::new()
             .write(true)
             .create(true)
@@ -161,11 +162,23 @@ fn main() {
             .open(file_path)
         {
             Ok(mut file) => {
+                // Write the generated include guard to the file.
                 if let Err(e) = file.write_all(guard.as_bytes()) {
                     eprintln!("Error writing to file '{}': {}", file_path, e);
                     std::process::exit(1);
                 }
                 println!("Guard written to '{}'.", file_path);
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                eprintln!(
+                    "Error: File '{}' already exists. Use --overwrite to overwrite.",
+                    file_path
+                );
+                std::process::exit(1);
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
+                eprintln!("Error: Permission denied when accessing '{}'.", file_path);
+                std::process::exit(1);
             }
             Err(e) => {
                 eprintln!("Error creating file '{}': {}", file_path, e);
