@@ -189,3 +189,75 @@ fn main() {
         println!("{}", guard);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use regex::Regex;
+
+    fn extract_uuids(text: &str) -> Vec<String> {
+        let re =
+            Regex::new(r"[0-9A-F]{8}_[0-9A-F]{4}_[0-9A-F]{4}_[0-9A-F]{4}_[0-9A-F]{12}").unwrap();
+
+        re.find_iter(text)
+            .map(|mat| mat.as_str().to_string())
+            .collect()
+    }
+
+    #[test]
+    fn test_generate_guard_default() {
+        let result = generate_guard("TEST".to_string(), None, Language::None, LineEnding::LF);
+
+        let uuids = extract_uuids(result.as_str());
+
+        assert!(uuids.len() == 3);
+        assert!(uuids[0] == uuids[1]);
+        assert!(uuids[1] == uuids[2]);
+
+        let uuid = &uuids[0];
+        assert!(result.contains(format!("#ifndef TEST_{}", uuid).as_str()));
+        assert!(result.contains(format!("#define TEST_{}", uuid).as_str()));
+        assert!(result.contains(format!("#endif /* TEST_{} */", uuid).as_str()));
+    }
+
+    #[test]
+    fn test_generate_guard_with_suffix() {
+        let result = generate_guard(
+            "TEST".to_string(),
+            Some("SUFFIX".to_string()),
+            Language::Cxx,
+            LineEnding::LF,
+        );
+
+        let uuids = extract_uuids(result.as_str());
+
+        assert!(uuids.len() == 3);
+        assert!(uuids[0] == uuids[1]);
+        assert!(uuids[1] == uuids[2]);
+
+        let uuid = &uuids[0];
+        assert!(result.contains(format!("#ifndef TEST_{}_SUFFIX", uuid).as_str()));
+        assert!(result.contains(format!("#define TEST_{}_SUFFIX", uuid).as_str()));
+        assert!(result.contains(format!("#endif /* TEST_{}_SUFFIX */", uuid).as_str()));
+    }
+
+    #[test]
+    fn test_generate_guard_with_c_compatibility() {
+        let result = generate_guard("TEST".to_string(), None, Language::C, LineEnding::LF);
+
+        let uuids = extract_uuids(result.as_str());
+
+        assert!(uuids.len() == 3);
+        assert!(uuids[0] == uuids[1]);
+        assert!(uuids[1] == uuids[2]);
+
+        let uuid = &uuids[0];
+        assert!(result.contains(format!("#ifndef TEST_{}", uuid).as_str()));
+        assert!(result.contains(format!("#define TEST_{}", uuid).as_str()));
+        assert!(result.contains(format!("#endif /* TEST_{} */", uuid).as_str()));
+
+        assert!(result.contains("#ifdef __cplusplus"));
+        assert!(result.contains("extern \"C\" {"));
+        assert!(result.contains("} /* extern \"C\" */"));
+    }
+}
