@@ -1,8 +1,10 @@
 [package]
 name = "guardgen"
-version = "1.0.1"
+version = "1.2.0"
 edition = "2021"
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/daisuke-nagao/GuardGen"
 
 [dependencies]
 clap = { version = "4.5.27", features = ["derive"] }
