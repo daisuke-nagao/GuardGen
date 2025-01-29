@@ -1,14 +1,15 @@
-/*
- * SPDX-FileCopyrightText: 2025 Daisuke Nagao
- *
- * SPDX-License-Identifier: MIT
- */
+// SPDX-FileCopyrightText: 2025 Daisuke Nagao
+// SPDX-License-Identifier: MIT
 
 use clap::{Parser, ValueEnum};
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 
+/// Enum representing the target language.
+/// - `None`: No language-specific modifications.
+/// - `C`: Adds `extern "C"` for C compatibility.
+/// - `Cxx`: No additional modifications (C++ default behavior).
 #[derive(Clone, Debug, ValueEnum)]
 enum Language {
     None,
@@ -17,6 +18,10 @@ enum Language {
 }
 
 #[allow(clippy::upper_case_acronyms)]
+/// Enum representing line-ending styles.
+/// - `None`: Uses system default.
+/// - `LF`: Uses Unix-style LF.
+/// - `CRLF`: Uses Windows-style CRLF.
 #[derive(Clone, Debug, ValueEnum)]
 enum LineEnding {
     None,
@@ -24,6 +29,7 @@ enum LineEnding {
     CRLF,
 }
 
+/// Command-line argument parser using `clap`.
 #[derive(Parser, Debug)]
 #[command(
     author = "Daisuke Nagao",
@@ -86,26 +92,42 @@ struct Args {
     line_ending: LineEnding,
 }
 
+/// Generates an include guard string with optional language-specific modifications.
+///
+/// # Arguments
+/// * `prefix` - A prefix string for the guard name.
+/// * `suffix` - An optional suffix for the guard name.
+/// * `x` - The target language (C or C++).
+/// * `line_ending` - The line-ending format.
+///
+/// # Returns
+/// A formatted include guard string.
 fn generate_guard(
     prefix: String,
     suffix: Option<String>,
     x: Language,
     line_ending: LineEnding,
 ) -> String {
+    // Generate a UUID and format it for use in the include guard.
     let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
     let mut guard = vec![prefix, uuid];
+
+    // Append suffix if provided.
     if let Some(suffix) = suffix {
         guard.push(suffix);
     }
 
+    // Join guard components with underscores.
     let guard = guard.join("_");
 
+    // Define standard include guard macros.
     let ifndef = format!("#ifndef {}", guard);
     let define = format!("#define {}", guard);
     let endif = format!("#endif /* {} */", guard);
 
     let mut text = vec![ifndef, define];
 
+    // If the target language is C, add `extern "C"` blocks for compatibility.
     if let Language::C = x {
         let extern_c: Vec<String> = vec![
             "".to_string(), // blank line
@@ -121,13 +143,15 @@ fn generate_guard(
         text.extend(extern_c);
     }
 
+    // Append closing `#endif` statement.
     text.push(endif);
     text.push("".to_string());
 
+    // Determine the newline character based on the specified line-ending format.
     let newline = match line_ending {
         LineEnding::LF => "\n",
         LineEnding::CRLF => "\r\n",
-        _ => {
+        LineEnding::None => {
             if cfg!(target_os = "windows") {
                 "\r\n"
             } else {
@@ -137,15 +161,20 @@ fn generate_guard(
     }
     .to_string();
 
+    // Join all lines with the appropriate newline character.
     text.join(&newline)
 }
 
+/// Main function that parses arguments and generates the include guard.
 fn main() {
+    // Parse command-line arguments using `clap`.
     let args = Args::parse();
 
+    // Generate the include guard based on user input.
     let guard = generate_guard(args.prefix, args.suffix, args.x, args.line_ending);
 
     if let Some(file_path) = &args.filename {
+        // Check if the file already exists and prevent overwriting unless explicitly allowed.
         if !args.overwrite && fs::metadata(file_path).is_ok() {
             eprintln!(
                 "Error: File '{}' already exists. Use --overwrite to overwrite.",
@@ -186,6 +215,7 @@ fn main() {
             }
         }
     } else {
+        // Print the include guard to stdout if no output file is specified.
         println!("{}", guard);
     }
 }
