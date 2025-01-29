@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `long_about` to provide a detailed overview of the tool.
   - Enhanced `help` descriptions for all command-line arguments.
   - Clarified language options (`none`, `c`, `cxx`) and line-ending styles (`none`, `lf`, `crlf`).
+- Improved error handling for file operations.
+  - Added specific error handling for `AlreadyExists` and `PermissionDenied` cases.
+  - Improved error messages to provide clearer feedback on file operation failures.
 
 ---
 
