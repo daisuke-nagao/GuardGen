@@ -25,24 +25,64 @@ enum LineEnding {
 }
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(
+    author = "Daisuke Nagao",
+    version,
+    about = "Generates include guards with optional UUID-based naming.",
+    long_about = "This tool generates unique include guards for C/C++ header files.\n\
+                  The guard name is based on a UUID and optional prefix/suffix.\n\
+                  It supports different languages and line-ending formats.\n\
+                  The output can be printed to stdout or written to a file."
+)]
 struct Args {
-    #[arg(short = 'o', long = "output")]
+    /// Output filename (if omitted, prints to stdout)
+    #[arg(
+        short = 'o',
+        long = "output",
+        help = "Specify the output file. If omitted, prints to stdout."
+    )]
     filename: Option<String>,
 
-    #[arg(long, default_value_t = false)]
+    /// Overwrite existing file if specified
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Overwrite the output file if it already exists."
+    )]
     overwrite: bool,
 
-    #[arg(long = "prefix", default_value = "UUID")]
+    /// Prefix for the include guard (default: "UUID")
+    #[arg(
+        long = "prefix",
+        default_value = "UUID",
+        help = "Specify a prefix for the include guard. Default: 'UUID'."
+    )]
     prefix: String,
 
-    #[arg(long = "suffix", default_value = None)]
+    /// Suffix for the include guard (optional)
+    #[arg(long = "suffix", default_value = None, help = "Specify an optional suffix for the include guard.")]
     suffix: Option<String>,
 
-    #[arg(short, value_enum, default_value_t = Language::None, ignore_case = true)]
+    /// Language format (C/C++ specific adjustments)
+    #[arg(
+        short,
+        value_enum,
+        default_value_t = Language::None,
+        ignore_case = true,
+        help = "Specify the language for compatibility adjustments. \
+                Options: none (default), c (adds extern \"C\" blocks), cxx (no additional modification)."
+    )]
     x: Language,
 
-    #[arg(long="line-ending", value_enum, default_value_t = LineEnding::None, ignore_case=true)]
+    /// Line-ending style (LF/CRLF)
+    #[arg(
+        long = "line-ending",
+        value_enum,
+        default_value_t = LineEnding::None,
+        ignore_case = true,
+        help = "Specify the line-ending style. \
+                Options: none (auto-detect), lf (Unix-style LF), crlf (Windows-style CRLF)."
+    )]
     line_ending: LineEnding,
 }
 

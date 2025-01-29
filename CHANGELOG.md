@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Improved help messages for the `-h` option.
+  - Added `long_about` to provide a detailed overview of the tool.
+  - Enhanced `help` descriptions for all command-line arguments.
+  - Clarified language options (`none`, `c`, `cxx`) and line-ending styles (`none`, `lf`, `crlf`).
+
 ---
 
 ## [1.1.0] - 2025-01-28
