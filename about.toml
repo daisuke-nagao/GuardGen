@@ -1,5 +1,86 @@
-accepted = [
-    "Apache-2.0",
-    "MIT",
-    "Unicode-3.0",
-]
+accepted = ["Unlicense", "Apache-2.0", "MIT", "Unicode-3.0"]
+
+[uuid7.clarify]
+license = "Apache-2.0"
+
+[[uuid7.clarify.files]]
+path = 'LICENSE'
+license = 'Apache-2.0'
+checksum = 'c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4'
+
+[unicode-ident.clarify]
+license = "(MIT OR Apache-2.0) AND Unicode-3.0"
+
+[[unicode-ident.clarify.files]]
+path = 'LICENSE-APACHE'
+license = 'Apache-2.0'
+checksum = '62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a'
+
+[[unicode-ident.clarify.files]]
+path = 'LICENSE-MIT'
+license = 'MIT'
+checksum = '23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3'
+
+[[unicode-ident.clarify.files]]
+path = 'LICENSE-UNICODE'
+license = 'Unicode-3.0'
+checksum = 'f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1'
+
+[anstyle-wincon.clarify]
+license = "Apache-2.0 OR MIT"
+
+[[anstyle-wincon.clarify.files]]
+path = 'LICENSE-APACHE'
+license = "Apache-2.0"
+checksum = 'c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08'
+
+[[anstyle-wincon.clarify.files]]
+path = 'LICENSE-MIT'
+license = "MIT"
+checksum = '73b0d84e4b954ce904a00043379767ae2a5f8d4f40564639cee230f639fe4dae'
+
+[clap.clarify]
+license = "Apache-2.0 OR MIT"
+
+[[clap.clarify.files]]
+path = 'LICENSE-APACHE'
+license = "Apache-2.0"
+checksum = 'c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08'
+
+[[clap.clarify.files]]
+path = 'LICENSE-MIT'
+license = "MIT"
+checksum = '6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6'
+
+[clap_builder.clarify]
+license = "Apache-2.0 OR MIT"
+
+[[clap_builder.clarify.files]]
+path = 'LICENSE-APACHE'
+license = "Apache-2.0"
+checksum = 'c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4'
+
+[[clap_builder.clarify.files]]
+path = 'LICENSE-MIT'
+license = "MIT"
+checksum = '0d687e1f07b58fe68bda74668ff6326125e5e5efa184cce755cd84ac535b7058'
+
+[fstr.clarify]
+license = "Apache-2.0"
+
+[[fstr.clarify.files]]
+path = 'LICENSE'
+license = "Apache-2.0"
+checksum = 'c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4'
+
+[byteorder.clarify]
+license = "MIT OR Unlicense"
+[[byteorder.clarify.files]]
+path = 'LICENSE-MIT'
+license = "MIT"
+checksum = '0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f'
+
+[[byteorder.clarify.files]]
+path = 'UNLICENSE'
+license = "Unlicense"
+checksum = '7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c'
