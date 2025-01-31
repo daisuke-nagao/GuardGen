@@ -1,0 +1,43 @@
+name: "Feature Request"
+description: "Suggest an idea to improve this project"
+title: "[Feature Request]: "
+labels: []
+assignees:
+  - daisuke-nagao
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thank you for your feature request!**  
+        Please provide the details below to help us understand your idea.
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: "Problem Description"
+      description: "Is your feature request related to a problem? Describe the issue."
+      placeholder: "I'm always frustrated when [...]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: "Proposed Solution"
+      description: "Describe the solution you'd like to see."
+      placeholder: "I would like the system to [...]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternative Solutions"
+      description: "Describe any alternative solutions or features you've considered."
+      placeholder: "Instead of this, I have also considered [...]"
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: "Additional Context"
+      description: "Add any other relevant information or screenshots related to your request."

@@ -1,0 +1,43 @@
+name: "General Issue"
+description: "Use this template for issues that do not fit other categories."
+title: "[General]: "
+labels: []
+assignees:
+  - daisuke-nagao
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **This is a general issue template.**  
+        Use this template if your issue does not fit into bug reports or feature requests.
+
+  - type: input
+    id: issue_summary
+    attributes:
+      label: "Issue Summary"
+      description: "Provide a short summary of the issue."
+      placeholder: "Briefly describe the issue."
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue_details
+    attributes:
+      label: "Details"
+      description: "Provide a detailed explanation of the issue."
+      placeholder: "Describe the issue in detail, including relevant context."
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested_solution
+    attributes:
+      label: "Suggested Solution (if any)"
+      description: "If you have any suggestions for resolving this issue, describe them here."
+      placeholder: "Potential approaches or fixes."
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: "Additional Context"
+      description: "Add any other relevant information related to this issue."
