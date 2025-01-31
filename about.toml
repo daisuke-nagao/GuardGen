@@ -1,4 +1,4 @@
-accepted = ["Unlicense", "Apache-2.0", "MIT", "Unicode-3.0"]
+accepted = ["Apache-2.0", "MIT", "Unicode-3.0"]
 
 [uuid7.clarify]
 license = "Apache-2.0"
@@ -75,6 +75,7 @@ checksum = 'c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4'
 
 [byteorder.clarify]
 license = "MIT OR Unlicense"
+
 [[byteorder.clarify.files]]
 path = 'LICENSE-MIT'
 license = "MIT"
@@ -84,3 +85,29 @@ checksum = '0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f'
 path = 'UNLICENSE'
 license = "Unlicense"
 checksum = '7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c'
+
+[aho-corasick.clarify]
+license = "MIT OR Unlicense"
+
+[[aho-corasick.clarify.files]]
+path = "UNLICENSE"
+license = "Unlicense"
+checksum = "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+
+[[aho-corasick.clarify.files]]
+path = "LICENSE-MIT"
+license = "MIT"
+checksum = "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+
+[memchr.clarify]
+license = "MIT OR Unlicense"
+
+[[memchr.clarify.files]]
+path = "LICENSE-MIT"
+checksum = "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+license = "MIT"
+
+[[memchr.clarify.files]]
+path = "UNLICENSE"
+checksum = "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+license = "Unlicense"
