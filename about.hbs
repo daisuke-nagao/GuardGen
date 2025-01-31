@@ -1,0 +1,184 @@
+<html>
+
+<head>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --background-light: #f8f9fa;
+            --background-dark: #222;
+            --text-light: #333;
+            --text-dark: #f8f8f2;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial,Helvetica,sans-serif;
+            line-height: 1.6;
+            background: var(--background-light);
+            color: var(--text-light);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        pre {
+            font-family: Consolas, monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: var(--background-dark);
+                color: var(--text-dark);
+            }
+
+            a {
+                color: var(--primary-color);
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            background: linear-gradient(90deg, var(--primary-color), #7F7FD5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .intro p {
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        .licenses-overview {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+        }
+
+        .licenses-overview li {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .licenses-overview li {
+                background: var(--border-color);
+            }
+        }
+
+        .licenses-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .license {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .license {
+                background: var(--border-color);
+            }
+        }
+
+        .license h3 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .license-used-by {
+            margin-left: 20px;
+        }
+
+        .license-used-by li {
+            margin-bottom: 5px;
+        }
+
+        .license-text {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .license-text {
+                background: var(--border-color);
+            }
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: var(--primary-color);
+        }
+    </style>
+    <title>Third Party Licenses</title>
+</head>
+
+<body>
+    <main class="container">
+        <div class="intro">
+            <h1>Third Party Licenses</h1>
+            <p>This page lists the licenses of the projects used in GuardGen.</p>
+        </div>
+
+        <h2>Overview of licenses:</h2>
+        <ul class="licenses-overview">
+            {{#each overview}}
+            <li><a href="#{{id}}">{{name}}</a> ({{count}})</li>
+            {{/each}}
+        </ul>
+
+        <h2>All license text:</h2>
+        <ul class="licenses-list">
+            {{#each licenses}}
+            <li class="license">
+                <h3 id="{{id}}">{{name}}</h3>
+                <h4>Used by:</h4>
+                <ul class="license-used-by">
+                    {{#each used_by}}
+                    <li><a
+                            href="{{#if crate.repository}} {{crate.repository}} {{else}} https://crates.io/crates/{{crate.name}} {{/if}}">{{crate.name}}
+                            {{crate.version}}</a></li>
+                    {{/each}}
+                </ul>
+                <pre class="license-text">{{text}}</pre>
+            </li>
+            {{/each}}
+        </ul>
+    </main>
+</body>
+
+</html>
