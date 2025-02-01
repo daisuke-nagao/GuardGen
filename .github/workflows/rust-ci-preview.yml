@@ -16,10 +16,10 @@ jobs:
     strategy:
       matrix:
         os: 
-          - ubuntu-latest
-          - windows-latest
-          - macos-13
-          - macos-latest
+          - ubuntu-24.04-arm
+          - ubuntu-22.04-arm
+          - windows-2025
+          - macos-15
 
     steps:
       - name: Checkout repository
