@@ -1,5 +1,5 @@
 ---
-name: General Issue
+name: (Old) General Issue
 about: Use this template for issues that do not fit other categories.
 title: "[General]: "
 labels: ""
