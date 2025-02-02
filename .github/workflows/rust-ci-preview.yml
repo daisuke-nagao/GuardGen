@@ -1,4 +1,4 @@
-name: Rust Build and Test
+name: Rust Build and Test on Preview OS
 
 on:
   push:
