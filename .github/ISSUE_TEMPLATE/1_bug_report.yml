@@ -11,7 +11,7 @@ body:
         **Thank you for taking the time to report a bug!**  
         Please fill out the following details to help us identify and fix the issue.
 
-  - type: input
+  - type: textarea
     id: bug_description
     attributes:
       label: "Bug Description"
@@ -58,7 +58,7 @@ body:
     attributes:
       label: "Operating System & Environment"
       description: "Provide details about your operating system and environment."
-      placeholder: "OS: Windows 11, Version: 22H2"
+      placeholder: "e.g., OS: Windows 11, Version: 22H2"
     validations:
       required: true
 
