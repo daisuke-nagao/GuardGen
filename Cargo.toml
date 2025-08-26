@@ -14,5 +14,5 @@ uuid7 = "1.1.0"
 strip = "debuginfo"
 
 [dev-dependencies]
-regex = "1.11.1"
+regex = "1.11.2"
 
