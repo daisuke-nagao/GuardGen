@@ -8,7 +8,7 @@ repository = "https://github.com/daisuke-nagao/GuardGen"
 
 [dependencies]
 clap = { version = "4.5.43", features = ["derive"] }
-uuid7 = "1.1.0"
+uuid7 = "1.2.0"
 
 [profile.release]
 strip = "debuginfo"
