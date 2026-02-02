@@ -7,7 +7,7 @@ readme = "README.md"
 repository = "https://github.com/daisuke-nagao/GuardGen"
 
 [dependencies]
-clap = { version = "4.5.54", features = ["derive"] }
+clap = { version = "4.5.56", features = ["derive"] }
 uuid7 = "1.4.0"
 
 [profile.release]
