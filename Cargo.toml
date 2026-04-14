@@ -15,4 +15,3 @@ strip = "debuginfo"
 
 [dev-dependencies]
 regex = "1.12.3"
-

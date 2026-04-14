@@ -15,8 +15,8 @@ jobs:
 
     strategy:
       matrix:
-        os: 
-          - macos-26 
+        os:
+          - macos-26
 
     steps:
       - name: Checkout repository
