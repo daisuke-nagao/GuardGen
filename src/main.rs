@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use clap::Parser;
+use clap::ValueEnum;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -50,23 +51,23 @@ struct Args {
     #[arg(
         short,
         value_enum,
-        default_value_t = guardgen::Language::None,
+        default_value_t = LanguageArg::None,
         ignore_case = true,
         help = "Specify the language for compatibility adjustments. \
                 Options: none (default), c (adds extern \"C\" blocks), cxx (no additional modification)."
     )]
-    x: guardgen::Language,
+    x: LanguageArg,
 
     /// Line-ending style (LF/CRLF)
     #[arg(
         long = "line-ending",
         value_enum,
-        default_value_t = guardgen::LineEnding::None,
+        default_value_t = LineEndingArg::None,
         ignore_case = true,
         help = "Specify the line-ending style. \
                 Options: none (auto-detect), lf (Unix-style LF), crlf (Windows-style CRLF)."
     )]
-    line_ending: guardgen::LineEnding,
+    line_ending: LineEndingArg,
 }
 
 /// Main function that parses arguments and generates the include guard.
@@ -75,7 +76,13 @@ fn main() {
     let args = Args::parse();
 
     // Generate the include guard based on user input.
-    let guard = guardgen::generate_guard(args.prefix, args.suffix, args.x, args.line_ending);
+    // Convert CLI wrapper enums into library enums to keep the library clap-agnostic.
+    let guard = guardgen::generate_guard(
+        args.prefix,
+        args.suffix,
+        args.x.into(),
+        args.line_ending.into(),
+    );
 
     if let Some(file_path) = &args.filename {
         // Check if the file already exists and prevent overwriting unless explicitly allowed.
@@ -121,5 +128,43 @@ fn main() {
     } else {
         // Print the include guard to stdout if no output file is specified.
         println!("{}", guard);
+    }
+}
+
+// Wrapper enums for CLI integration.
+// These are defined in the binary crate so we can derive `clap::ValueEnum`
+// without violating Rust's orphan rules. They convert into the library
+// enums (`guardgen::Language` and `guardgen::LineEnding`).
+#[derive(ValueEnum, Clone, Copy, Debug)]
+enum LanguageArg {
+    None,
+    C,
+    Cxx,
+}
+
+impl From<LanguageArg> for guardgen::Language {
+    fn from(v: LanguageArg) -> guardgen::Language {
+        match v {
+            LanguageArg::None => guardgen::Language::None,
+            LanguageArg::C => guardgen::Language::C,
+            LanguageArg::Cxx => guardgen::Language::Cxx,
+        }
+    }
+}
+
+#[derive(ValueEnum, Clone, Copy, Debug)]
+enum LineEndingArg {
+    None,
+    LF,
+    CRLF,
+}
+
+impl From<LineEndingArg> for guardgen::LineEnding {
+    fn from(v: LineEndingArg) -> guardgen::LineEnding {
+        match v {
+            LineEndingArg::None => guardgen::LineEnding::None,
+            LineEndingArg::LF => guardgen::LineEnding::LF,
+            LineEndingArg::CRLF => guardgen::LineEnding::CRLF,
+        }
     }
 }

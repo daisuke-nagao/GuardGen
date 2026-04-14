@@ -1,13 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Daisuke Nagao
 // SPDX-License-Identifier: MIT
 
-use clap::ValueEnum;
-
 /// Enum representing the target language.
 /// - `None`: No language-specific modifications.
 /// - `C`: Adds `extern "C"` for C compatibility.
 /// - `Cxx`: No additional modifications (C++ default behavior).
-#[derive(Clone, Debug, ValueEnum)]
+#[derive(Copy, Clone, Debug)]
 pub enum Language {
     None,
     C,
@@ -19,7 +17,7 @@ pub enum Language {
 /// - `None`: Uses system default.
 /// - `LF`: Uses Unix-style LF.
 /// - `CRLF`: Uses Windows-style CRLF.
-#[derive(Clone, Debug, ValueEnum)]
+#[derive(Copy, Clone, Debug)]
 pub enum LineEnding {
     None,
     LF,
