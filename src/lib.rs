@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Daisuke Nagao
 // SPDX-License-Identifier: MIT
 
+use wasm_bindgen::prelude::*;
+
 /// Enum representing the target language.
 /// - `None`: No language-specific modifications.
 /// - `C`: Adds `extern "C"` for C compatibility.
@@ -10,6 +12,38 @@ pub enum Language {
     None,
     C,
     Cxx,
+}
+
+impl Language {
+    /// Parses a JavaScript-friendly language specifier.
+    ///
+    /// Preconditions:
+    /// - `value` is expected to represent one of: `none`, `c`, or `cxx`.
+    ///
+    /// Postconditions:
+    /// - Returns `Ok(Language)` when the value is recognized.
+    /// - Returns `Err(String)` with a human-readable reason when invalid.
+    ///
+    /// Invariants:
+    /// - The mapping is case-insensitive.
+    fn parse_for_wasm(value: &str) -> Result<Self, String> {
+        let normalized = value.trim().to_ascii_lowercase();
+        let parsed = match normalized.as_str() {
+            // Branch: explicit no-op language mode.
+            "none" => Ok(Self::None),
+            // Branch: C compatibility mode inserts extern "C" block.
+            "c" => Ok(Self::C),
+            // Branch: C++ mode uses plain include guard output.
+            "cxx" | "cpp" | "c++" => Ok(Self::Cxx),
+            // Branch: unsupported keyword from JavaScript caller.
+            _ => Err(format!(
+                "invalid language '{}'; expected one of: none, c, cxx",
+                value
+            )),
+        };
+
+        parsed
+    }
 }
 
 #[allow(clippy::upper_case_acronyms)]
@@ -22,6 +56,79 @@ pub enum LineEnding {
     None,
     LF,
     CRLF,
+}
+
+impl LineEnding {
+    /// Parses a JavaScript-friendly line-ending specifier.
+    ///
+    /// Preconditions:
+    /// - `value` is expected to represent one of: `none`, `lf`, or `crlf`.
+    ///
+    /// Postconditions:
+    /// - Returns `Ok(LineEnding)` when the value is recognized.
+    /// - Returns `Err(String)` with a human-readable reason when invalid.
+    ///
+    /// Invariants:
+    /// - The mapping is case-insensitive.
+    fn parse_for_wasm(value: &str) -> Result<Self, String> {
+        let normalized = value.trim().to_ascii_lowercase();
+        let parsed = match normalized.as_str() {
+            // Branch: auto-detects line ending based on runtime target.
+            "none" | "auto" => Ok(Self::None),
+            // Branch: enforces LF newline style.
+            "lf" => Ok(Self::LF),
+            // Branch: enforces CRLF newline style.
+            "crlf" => Ok(Self::CRLF),
+            // Branch: unsupported keyword from JavaScript caller.
+            _ => Err(format!(
+                "invalid line ending '{}'; expected one of: none, lf, crlf",
+                value
+            )),
+        };
+
+        parsed
+    }
+}
+
+/// WebAssembly-exported wrapper for JavaScript/browser callers.
+///
+/// Preconditions:
+/// - `prefix` should be a non-empty identifier-like string.
+/// - `language` should be one of: `none`, `c`, or `cxx`.
+/// - `line_ending` should be one of: `none`, `lf`, or `crlf`.
+///
+/// Postconditions:
+/// - Returns the generated include guard text on success.
+/// - Returns a JavaScript exception (`JsValue`) if inputs are invalid.
+///
+/// Invariants:
+/// - Delegates guard construction to `generate_guard` so output format remains consistent.
+#[wasm_bindgen]
+pub fn generate_guard_wasm(
+    prefix: &str,
+    suffix: Option<String>,
+    language: &str,
+    line_ending: &str,
+) -> Result<String, JsValue> {
+    // Preconditions: reject empty prefixes early because they produce malformed guard names.
+    if prefix.trim().is_empty() {
+        return Err(JsValue::from_str("prefix must not be empty"));
+    }
+
+    let language_value = Language::parse_for_wasm(language)
+        .map_err(|err| JsValue::from_str(format!("language error: {}", err).as_str()))?;
+    let line_ending_value = LineEnding::parse_for_wasm(line_ending)
+        .map_err(|err| JsValue::from_str(format!("line ending error: {}", err).as_str()))?;
+
+    // Branch: suffix is optional and passed through unchanged to core logic.
+    let generated = generate_guard(
+        prefix.to_string(),
+        suffix,
+        language_value,
+        line_ending_value,
+    );
+
+    Ok(generated)
 }
 
 /// Generates an include guard string with optional language-specific modifications.
