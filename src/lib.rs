@@ -110,6 +110,11 @@ pub fn generate_guard_wasm(
     language: &str,
     line_ending: &str,
 ) -> Result<String, JsValue> {
+    // Install panic hook so Rust panic messages appear in browser devtools console.
+    // This statement is compiled only on wasm32 targets where the crate is available.
+    #[cfg(target_arch = "wasm32")]
+    console_error_panic_hook::set_once();
+
     // Preconditions: reject empty prefixes early because they produce malformed guard names.
     if prefix.trim().is_empty() {
         return Err(JsValue::from_str("prefix must not be empty"));
@@ -147,8 +152,78 @@ pub fn generate_guard(
     x: Language,
     line_ending: LineEnding,
 ) -> String {
-    // Generate a UUID and format it for use in the include guard.
-    let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
+    // Generate a UUID-like identifier for use in the include guard.
+    // Use `uuid7` on native targets. For `wasm32`, instantiate a `V7Generator`
+    // with a JS-backed `TimeSource` (Date.now()) and a `RandSource` that uses
+    // `getrandom` so we avoid calls to `std::time` which panic on wasm.
+    #[cfg(target_arch = "wasm32")]
+    mod wasm_uuid7 {
+        use js_sys::Date;
+        use once_cell::sync::Lazy;
+        use std::sync::Mutex;
+        use uuid7::generator::{RandSource, TimeSource};
+        use uuid7::V7Generator;
+
+        pub struct WasmTimeSource;
+        impl TimeSource for WasmTimeSource {
+            fn unix_ts_ms(&mut self) -> u64 {
+                // Date::now() returns milliseconds as f64; cast to u64.
+                Date::now() as u64
+            }
+        }
+
+        use web_sys::window;
+
+        pub struct GetRandomSource;
+        impl RandSource for GetRandomSource {
+            fn next_u32(&mut self) -> u32 {
+                let mut b = [0u8; 4];
+                let win = window().expect("no window");
+                let crypto = win.crypto().expect("no crypto available");
+                // Fill via get_random_values into a Uint8Array backed by our buffer
+                crypto
+                    .get_random_values_with_u8_array(&mut b)
+                    .expect("get_random_values failed");
+                u32::from_be_bytes(b)
+            }
+
+            fn next_u64(&mut self) -> u64 {
+                let mut b = [0u8; 8];
+                let win = window().expect("no window");
+                let crypto = win.crypto().expect("no crypto available");
+                crypto
+                    .get_random_values_with_u8_array(&mut b)
+                    .expect("get_random_values failed");
+                u64::from_be_bytes(b)
+            }
+        }
+
+        static GLOBAL_GEN: Lazy<Mutex<V7Generator<GetRandomSource, WasmTimeSource>>> =
+            Lazy::new(|| {
+                Mutex::new(V7Generator::with_rand_and_time_sources(
+                    GetRandomSource,
+                    WasmTimeSource,
+                ))
+            });
+
+        pub fn generate_uuid_string() -> String {
+            let mut g = GLOBAL_GEN.lock().unwrap();
+            g.generate().to_string()
+        }
+    }
+
+    let uuid = {
+        #[cfg(target_arch = "wasm32")]
+        {
+            wasm_uuid7::generate_uuid_string()
+                .replace('-', "_")
+                .to_uppercase()
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            uuid7::uuid7().to_string().replace('-', "_").to_uppercase()
+        }
+    };
     let mut guard = vec![prefix, uuid];
 
     // Append suffix if provided.
