@@ -1,7 +1,7 @@
 [package]
 name = "guardgen"
 version = "1.2.1"
-edition = "2021"
+edition = "2024"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/daisuke-nagao/GuardGen"
@@ -23,6 +23,7 @@ console_error_panic_hook = "0.1.7"
 
 [profile.release]
 strip = "debuginfo"
+lto = true
 
 [dev-dependencies]
 regex = "1.12.3"
