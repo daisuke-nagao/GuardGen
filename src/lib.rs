@@ -97,7 +97,6 @@ pub fn generate_guard(
     text.join(&newline)
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

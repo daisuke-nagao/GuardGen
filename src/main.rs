@@ -112,32 +112,18 @@ struct Args {
     line_ending: LineEnding,
 }
 
-/// Generates an include guard string with optional language-specific modifications.
-///
-/// # Arguments
-/// * `prefix` - A prefix string for the guard name.
-/// * `suffix` - An optional suffix for the guard name.
-/// * `x` - The target language (C or C++).
-/// * `line_ending` - The line-ending format.
-///
-/// # Returns
-/// A formatted include guard string.
-fn generate_guard(
-    prefix: String,
-    suffix: Option<String>,
-    x: Language,
-    line_ending: LineEnding,
-) -> String {
-    guardgen::generate_guard(prefix, suffix, x.into(), line_ending.into())
-}
-
 /// Main function that parses arguments and generates the include guard.
 fn main() {
     // Parse command-line arguments using `clap`.
     let args = Args::parse();
 
     // Generate the include guard based on user input.
-    let guard = generate_guard(args.prefix, args.suffix, args.x, args.line_ending);
+    let guard = guardgen::generate_guard(
+        args.prefix,
+        args.suffix,
+        args.x.into(),
+        args.line_ending.into(),
+    );
 
     if let Some(file_path) = &args.filename {
         // Check if the file already exists and prevent overwriting unless explicitly allowed.
