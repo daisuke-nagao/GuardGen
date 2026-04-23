@@ -24,7 +24,6 @@ pub enum LineEnding {
     CRLF,
 }
 
-
 /// Generates an include guard string with optional language-specific modifications.
 ///
 /// # Arguments

@@ -128,61 +128,7 @@ fn generate_guard(
     x: Language,
     line_ending: LineEnding,
 ) -> String {
-    // Generate a UUID and format it for use in the include guard.
-    let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
-    let mut guard = vec![prefix, uuid];
-
-    // Append suffix if provided.
-    if let Some(suffix) = suffix {
-        guard.push(suffix);
-    }
-
-    // Join guard components with underscores.
-    let guard = guard.join("_");
-
-    // Define standard include guard macros.
-    let ifndef = format!("#ifndef {}", guard);
-    let define = format!("#define {}", guard);
-    let endif = format!("#endif /* {} */", guard);
-
-    let mut text = vec![ifndef, define];
-
-    // If the target language is C, add `extern "C"` blocks for compatibility.
-    if let Language::C = x {
-        let extern_c: Vec<String> = vec![
-            "".to_string(), // blank line
-            "#ifdef __cplusplus".to_string(),
-            "extern \"C\" {".to_string(),
-            "#endif /* __cplusplus */".to_string(),
-            "".to_string(), // blank line
-            "#ifdef __cplusplus".to_string(),
-            "} /* extern \"C\" */".to_string(),
-            "#endif /* __cplusplus */".to_string(),
-            "".to_string(), // blank line
-        ];
-        text.extend(extern_c);
-    }
-
-    // Append closing `#endif` statement.
-    text.push(endif);
-    text.push("".to_string());
-
-    // Determine the newline character based on the specified line-ending format.
-    let newline = match line_ending {
-        LineEnding::LF => "\n",
-        LineEnding::CRLF => "\r\n",
-        LineEnding::None => {
-            if cfg!(target_os = "windows") {
-                "\r\n"
-            } else {
-                "\n"
-            }
-        }
-    }
-    .to_string();
-
-    // Join all lines with the appropriate newline character.
-    text.join(&newline)
+    guardgen::generate_guard(prefix, suffix, x.into(), line_ending.into())
 }
 
 /// Main function that parses arguments and generates the include guard.
