@@ -17,6 +17,16 @@ enum Language {
     Cxx,
 }
 
+impl Into<guardgen::Language> for Language {
+    fn into(self) -> guardgen::Language {
+        match self {
+            Language::None => guardgen::Language::None,
+            Language::C => guardgen::Language::C,
+            Language::Cxx => guardgen::Language::Cxx,
+        }
+    }
+}
+
 #[allow(clippy::upper_case_acronyms)]
 /// Enum representing line-ending styles.
 /// - `None`: Uses system default.
@@ -27,6 +37,16 @@ enum LineEnding {
     None,
     LF,
     CRLF,
+}
+
+impl Into<guardgen::LineEnding> for LineEnding {
+    fn into(self) -> guardgen::LineEnding {
+        match self {
+            LineEnding::None => guardgen::LineEnding::None,
+            LineEnding::LF => guardgen::LineEnding::LF,
+            LineEnding::CRLF => guardgen::LineEnding::CRLF,
+        }
+    }
 }
 
 /// Command-line argument parser using `clap`.
