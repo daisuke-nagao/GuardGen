@@ -11,3 +11,15 @@ pub enum Language {
     C,
     Cxx,
 }
+
+#[allow(clippy::upper_case_acronyms)]
+/// Enum representing line-ending styles.
+/// - `None`: Uses system default.
+/// - `LF`: Uses Unix-style LF.
+/// - `CRLF`: Uses Windows-style CRLF.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum LineEnding {
+    None,
+    LF,
+    CRLF,
+}
