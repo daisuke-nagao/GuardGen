@@ -1,11 +1,53 @@
 // SPDX-FileCopyrightText: 2025 Daisuke Nagao
 // SPDX-License-Identifier: MIT
 
-use clap::Parser;
-use clap::ValueEnum;
+use clap::{Parser, ValueEnum};
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
+
+/// Enum representing the target language.
+/// - `None`: No language-specific modifications.
+/// - `C`: Adds `extern "C"` for C compatibility.
+/// - `Cxx`: No additional modifications (C++ default behavior).
+#[derive(Clone, Debug, ValueEnum)]
+enum Language {
+    None,
+    C,
+    Cxx,
+}
+
+impl From<Language> for guardgen_lib::Language {
+    fn from(val: Language) -> Self {
+        match val {
+            Language::None => guardgen_lib::Language::None,
+            Language::C => guardgen_lib::Language::C,
+            Language::Cxx => guardgen_lib::Language::Cxx,
+        }
+    }
+}
+
+#[allow(clippy::upper_case_acronyms)]
+/// Enum representing line-ending styles.
+/// - `None`: Uses system default.
+/// - `LF`: Uses Unix-style LF.
+/// - `CRLF`: Uses Windows-style CRLF.
+#[derive(Clone, Debug, ValueEnum)]
+enum LineEnding {
+    None,
+    LF,
+    CRLF,
+}
+
+impl From<LineEnding> for guardgen_lib::LineEnding {
+    fn from(val: LineEnding) -> Self {
+        match val {
+            LineEnding::None => guardgen_lib::LineEnding::None,
+            LineEnding::LF => guardgen_lib::LineEnding::LF,
+            LineEnding::CRLF => guardgen_lib::LineEnding::CRLF,
+        }
+    }
+}
 
 /// Command-line argument parser using `clap`.
 #[derive(Parser, Debug)]
@@ -51,23 +93,23 @@ struct Args {
     #[arg(
         short,
         value_enum,
-        default_value_t = LanguageArg::None,
+        default_value_t = Language::None,
         ignore_case = true,
         help = "Specify the language for compatibility adjustments. \
                 Options: none (default), c (adds extern \"C\" blocks), cxx (no additional modification)."
     )]
-    x: LanguageArg,
+    x: Language,
 
     /// Line-ending style (LF/CRLF)
     #[arg(
         long = "line-ending",
         value_enum,
-        default_value_t = LineEndingArg::None,
+        default_value_t = LineEnding::None,
         ignore_case = true,
         help = "Specify the line-ending style. \
                 Options: none (auto-detect), lf (Unix-style LF), crlf (Windows-style CRLF)."
     )]
-    line_ending: LineEndingArg,
+    line_ending: LineEnding,
 }
 
 /// Main function that parses arguments and generates the include guard.
@@ -76,8 +118,7 @@ fn main() {
     let args = Args::parse();
 
     // Generate the include guard based on user input.
-    // Convert CLI wrapper enums into library enums to keep the library clap-agnostic.
-    let guard = guardgen::generate_guard(
+    let guard = guardgen_lib::generate_guard(
         args.prefix,
         args.suffix,
         args.x.into(),
@@ -128,43 +169,5 @@ fn main() {
     } else {
         // Print the include guard to stdout if no output file is specified.
         println!("{}", guard);
-    }
-}
-
-// Wrapper enums for CLI integration.
-// These are defined in the binary crate so we can derive `clap::ValueEnum`
-// without violating Rust's orphan rules. They convert into the library
-// enums (`guardgen::Language` and `guardgen::LineEnding`).
-#[derive(ValueEnum, Clone, Copy, Debug)]
-enum LanguageArg {
-    None,
-    C,
-    Cxx,
-}
-
-impl From<LanguageArg> for guardgen::Language {
-    fn from(v: LanguageArg) -> guardgen::Language {
-        match v {
-            LanguageArg::None => guardgen::Language::None,
-            LanguageArg::C => guardgen::Language::C,
-            LanguageArg::Cxx => guardgen::Language::Cxx,
-        }
-    }
-}
-
-#[derive(ValueEnum, Clone, Copy, Debug)]
-enum LineEndingArg {
-    None,
-    LF,
-    CRLF,
-}
-
-impl From<LineEndingArg> for guardgen::LineEnding {
-    fn from(v: LineEndingArg) -> guardgen::LineEnding {
-        match v {
-            LineEndingArg::None => guardgen::LineEnding::None,
-            LineEndingArg::LF => guardgen::LineEnding::LF,
-            LineEndingArg::CRLF => guardgen::LineEnding::CRLF,
-        }
     }
 }
