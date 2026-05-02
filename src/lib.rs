@@ -1,10 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Daisuke Nagao
 // SPDX-License-Identifier: MIT
 
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+use wasm_bindgen::prelude::*;
+
 /// Enum representing the target language.
 /// - `None`: No language-specific modifications.
 /// - `C`: Adds `extern "C"` for C compatibility.
 /// - `Cxx`: No additional modifications (C++ default behavior).
+#[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Language {
     None,
@@ -12,11 +16,12 @@ pub enum Language {
     Cxx,
 }
 
-#[allow(clippy::upper_case_acronyms)]
 /// Enum representing line-ending styles.
 /// - `None`: Uses system default.
 /// - `LF`: Uses Unix-style LF.
 /// - `CRLF`: Uses Windows-style CRLF.
+#[allow(clippy::upper_case_acronyms)]
+#[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum LineEnding {
     None,
@@ -34,6 +39,7 @@ pub enum LineEnding {
 ///
 /// # Returns
 /// A formatted include guard string.
+#[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen)]
 pub fn generate_guard(
     prefix: String,
     suffix: Option<String>,
@@ -41,7 +47,7 @@ pub fn generate_guard(
     line_ending: LineEnding,
 ) -> String {
     // Generate a UUID and format it for use in the include guard.
-    let uuid = uuid7::uuid7().to_string().replace('-', "_").to_uppercase();
+    let uuid = generate().to_string().replace('-', "_").to_uppercase();
     let mut guard = vec![prefix, uuid];
 
     // Append suffix if provided.
@@ -95,6 +101,35 @@ pub fn generate_guard(
 
     // Join all lines with the appropriate newline character.
     text.join(&newline)
+}
+
+fn unix_time() -> (u64, u32) {
+    #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+    {
+        // `js_sys::Date::now()` returns milliseconds since the epoch as an `f64`.
+        // Convert to integer milliseconds, then split into seconds and nanoseconds.
+        let unix_ms = js_sys::Date::now().floor() as u64;
+        let seconds = unix_ms / 1000u64;
+        let nanos = ((unix_ms % 1000) as u32) * 1_000_000u32;
+        (seconds, nanos)
+    }
+    #[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
+    {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("Time went backwards");
+        let seconds = now.as_secs();
+        // `subsec_millis()` returns the subsecond part in milliseconds; convert to nanoseconds.
+        let nanos = now.subsec_millis() * 1_000_000;
+        (seconds, nanos)
+    }
+}
+
+fn generate() -> uuid::Uuid {
+    let (seconds, millis) = unix_time();
+    let ts = uuid::Timestamp::from_unix(uuid::NoContext, seconds, millis);
+
+    uuid::Uuid::new_v7(ts)
 }
 
 #[cfg(test)]

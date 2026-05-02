@@ -17,12 +17,12 @@ enum Language {
     Cxx,
 }
 
-impl Into<guardgen::Language> for Language {
-    fn into(self) -> guardgen::Language {
-        match self {
-            Language::None => guardgen::Language::None,
-            Language::C => guardgen::Language::C,
-            Language::Cxx => guardgen::Language::Cxx,
+impl From<Language> for guardgen_lib::Language {
+    fn from(val: Language) -> Self {
+        match val {
+            Language::None => guardgen_lib::Language::None,
+            Language::C => guardgen_lib::Language::C,
+            Language::Cxx => guardgen_lib::Language::Cxx,
         }
     }
 }
@@ -39,12 +39,12 @@ enum LineEnding {
     CRLF,
 }
 
-impl Into<guardgen::LineEnding> for LineEnding {
-    fn into(self) -> guardgen::LineEnding {
-        match self {
-            LineEnding::None => guardgen::LineEnding::None,
-            LineEnding::LF => guardgen::LineEnding::LF,
-            LineEnding::CRLF => guardgen::LineEnding::CRLF,
+impl From<LineEnding> for guardgen_lib::LineEnding {
+    fn from(val: LineEnding) -> Self {
+        match val {
+            LineEnding::None => guardgen_lib::LineEnding::None,
+            LineEnding::LF => guardgen_lib::LineEnding::LF,
+            LineEnding::CRLF => guardgen_lib::LineEnding::CRLF,
         }
     }
 }
@@ -118,7 +118,7 @@ fn main() {
     let args = Args::parse();
 
     // Generate the include guard based on user input.
-    let guard = guardgen::generate_guard(
+    let guard = guardgen_lib::generate_guard(
         args.prefix,
         args.suffix,
         args.x.into(),
