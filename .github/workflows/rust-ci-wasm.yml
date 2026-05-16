@@ -40,6 +40,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-build-
 
+      - name: Install Rust toolchain
+        run: rustup target add wasm32-unknown-unknown
+
       - name: Setup `wasmtime`
         uses: bytecodealliance/actions/wasmtime/setup@v1
 
