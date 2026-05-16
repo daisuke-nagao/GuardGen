@@ -41,7 +41,7 @@ jobs:
             ${{ runner.os }}-cargo-build-
 
       - name: Install Rust toolchain
-        run: rustup target add wasm32-unknown-unknown
+        run: rustup target add wasm32-wasip2
 
       - name: Setup `wasmtime`
         uses: bytecodealliance/actions/wasmtime/setup@v1
