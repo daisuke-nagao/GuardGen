@@ -1,0 +1,53 @@
+name: Rust Build and Test Wasm
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build and Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+          - ubuntu-22.04-arm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache Cargo build
+        uses: actions/cache@v5
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-
+
+      - name: Setup `wasmtime`
+        uses: bytecodealliance/actions/wasmtime/setup@v1
+
+      - name: Build the project
+        run: cargo build --verbose --target wasm32-wasip2
+
+      - name: Run unit tests
+        run: cargo test --verbose --target wasm32-wasip2 -c target.wasm32-wasip2.runner=wasmtime
+
+      - name: Check for warnings
+        run: cargo check --all-targets --all-features --verbose --target wasm32-wasip2
