@@ -50,7 +50,7 @@ jobs:
         run: cargo build --verbose --target wasm32-wasip2
 
       - name: Run unit tests
-        run: cargo test --verbose --target wasm32-wasip2 -c target.wasm32-wasip2.runner=wasmtime
+        run: cargo test --verbose --target wasm32-wasip2 --config target.wasm32-wasip2.runner=wasmtime
 
       - name: Check for warnings
         run: cargo check --all-targets --all-features --verbose --target wasm32-wasip2
