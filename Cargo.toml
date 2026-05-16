@@ -20,7 +20,7 @@ uuid = { version = "1.23.1", features = ["rng-getrandom", "v4", "v7"] }
 
 [target.wasm32-unknown-unknown.dependencies]
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
-js-sys = "0.3.95"
+js-sys = "0.3.98"
 wasm-bindgen = { version = "0.2.118" }
 uuid = { version = "1.23.1", features = ["rng-getrandom", "v4", "v7", "js"] }
 
