@@ -93,8 +93,5 @@ jobs:
       - name: Install wasm-pack
         run: cargo install --locked wasm-pack
 
-      - name: Build the project
-        run: wasm-pack build --target web
-
       - name: Run unit tests
         run: wasm-pack test --headless --${{ matrix.browser }}
