@@ -89,6 +89,9 @@ jobs:
       - name: Install Rust toolchain
         run: rustup target add wasm32-unknown-unknown
 
+      - name: Install wasm-pack
+        run: cargo install --locked wasm-pack
+
       - name: Build the project
         run: wasm-pack build --target web
 
