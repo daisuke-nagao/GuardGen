@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Build and Test on ${{ matrix.os }}
+    name: Build and Test on ${{ matrix.os }} for wasm32-wasip2
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -56,7 +56,7 @@ jobs:
         run: cargo check --all-targets --all-features --verbose --target wasm32-wasip2
 
   build-and-test-wasm-unknown-unknown:
-    name: Build and Test on ${{ matrix.os }}
+    name: Build and Test on ${{ matrix.os }} for wasm32-unknown-unknown
     runs-on: ${{ matrix.os }}
 
     strategy:
