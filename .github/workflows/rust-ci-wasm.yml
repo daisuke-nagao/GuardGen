@@ -65,6 +65,9 @@ jobs:
           - ubuntu-latest
           - ubuntu-24.04-arm
           - ubuntu-22.04-arm
+        browser:
+          - chrome
+          - firefox
 
     steps:
       - name: Checkout repository
@@ -96,4 +99,4 @@ jobs:
         run: wasm-pack build --target web
 
       - name: Run unit tests
-        run: wasm-pack test
+        run: wasm-pack test --headless --${{ matrix.browser }}
