@@ -63,8 +63,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-24.04-arm
-          - ubuntu-22.04-arm
         browser:
           - chrome
           - firefox
