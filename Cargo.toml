@@ -24,6 +24,9 @@ js-sys = "0.3.95"
 wasm-bindgen = { version = "0.2.118" }
 uuid = { version = "1.23.1", features = ["rng-getrandom", "v4", "v7", "js"] }
 
+[target.wasm32-unknown-unknown.dev-dependencies]
+wasm-bindgen-test = "0.3.71"
+
 [profile.release]
 strip = "debuginfo"
 lto = true

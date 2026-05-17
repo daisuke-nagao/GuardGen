@@ -4,6 +4,9 @@
 #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
 use wasm_bindgen::prelude::*;
 
+#[cfg(all(target_arch = "wasm32", target_os = "unknown", test))]
+use wasm_bindgen_test::*;
+
 /// Enum representing the target language.
 /// - `None`: No language-specific modifications.
 /// - `C`: Adds `extern "C"` for C compatibility.
@@ -137,6 +140,9 @@ mod tests {
     use super::*;
     use regex::Regex;
 
+    #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
+
     fn extract_uuids(text: &str) -> Vec<String> {
         let re =
             Regex::new(r"[0-9A-F]{8}_[0-9A-F]{4}_[0-9A-F]{4}_[0-9A-F]{4}_[0-9A-F]{12}").unwrap();
@@ -146,7 +152,8 @@ mod tests {
             .collect()
     }
 
-    #[test]
+    #[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen_test)]
+    #[cfg_attr(not(all(target_arch = "wasm32", target_os = "unknown")), test)]
     fn test_generate_guard_default() {
         let result = generate_guard("TEST".to_string(), None, Language::None, LineEnding::LF);
 
@@ -162,7 +169,8 @@ mod tests {
         assert!(result.contains(format!("#endif /* TEST_{} */", uuid).as_str()));
     }
 
-    #[test]
+    #[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen_test)]
+    #[cfg_attr(not(all(target_arch = "wasm32", target_os = "unknown")), test)]
     fn test_generate_guard_with_suffix() {
         let result = generate_guard(
             "TEST".to_string(),
@@ -183,7 +191,8 @@ mod tests {
         assert!(result.contains(format!("#endif /* TEST_{}_SUFFIX */", uuid).as_str()));
     }
 
-    #[test]
+    #[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen_test)]
+    #[cfg_attr(not(all(target_arch = "wasm32", target_os = "unknown")), test)]
     fn test_generate_guard_with_c_compatibility() {
         let result = generate_guard("TEST".to_string(), None, Language::C, LineEnding::LF);
 
