@@ -117,12 +117,15 @@ fn main() {
     // Parse command-line arguments using `clap`.
     let args = Args::parse();
 
-    // Generate the include guard based on user input.
-    let guard = guardgen_lib::generate_guard(
+    // Generate the include guard based on user input using the struct-based API.
+    // For now, default to UUID v7 generation for compatibility.
+    let mut generator = guardgen_lib::IncludeGuardGenerator::new();
+    let guard = generator.generate(
         args.prefix,
         args.suffix,
         args.x.into(),
         args.line_ending.into(),
+        guardgen_lib::UuidKind::V7,
     );
 
     if let Some(file_path) = &args.filename {
