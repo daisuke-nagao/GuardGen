@@ -60,9 +60,9 @@ pub enum UuidKind {
 #[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen)]
 pub struct IncludeGuardGenerator {
     // Private context used for UUID v7 generation to avoid collisions on rapid calls.
-    // Stored as (last_seconds, last_nanos, counter) to provide a small monotonic
-    // context without depending on internal uuid crate types.
-    v7_context: Option<(u64, u32, u32)>,
+    // Store the official `ContextV7` from the `uuid` crate so we can rely on its
+    // reseeding/monotonic behaviour instead of rolling our own counter logic.
+    v7_context: Option<uuid::ContextV7>,
 }
 
 impl IncludeGuardGenerator {
@@ -77,7 +77,7 @@ impl IncludeGuardGenerator {
     /// same context while varying parameters.
     pub fn new() -> Self {
         IncludeGuardGenerator {
-            v7_context: Some((0u64, 0u32, 0u32)),
+            v7_context: Some(uuid::ContextV7::new()),
         }
     }
 
@@ -101,32 +101,16 @@ impl IncludeGuardGenerator {
         let uuid_string = match uuid_kind {
             UuidKind::V4 => uuid::Uuid::new_v4().to_string(),
             UuidKind::V7 => {
-                // Use the existing `unix_time` helper to get seconds and subsecond
-                // component. Maintain a tiny local context (last timestamp + counter)
-                // to avoid collisions when multiple calls occur within the same
-                // millisecond.
-                let (seconds, mut nanos) = unix_time();
+                // Use the crate-provided ContextV7 to produce a Timestamp that
+                // carries a proper counter; this avoids the previous manual
+                // counter arithmetic and follows the crate's reseeding/monotonic logic.
+                let (seconds, nanos) = unix_time();
 
-                if let Some(ctx) = self.v7_context.as_mut() {
-                    // ctx = (last_seconds, last_nanos, counter)
-                    if ctx.0 == seconds && ctx.1 == nanos {
-                        // Same timestamp as previous; bump a small counter and
-                        // adjust the nanoseconds to preserve uniqueness.
-                        ctx.2 = ctx.2.saturating_add(1);
-                        // Add the counter value to the nanos, clamping under 1e9.
-                        nanos = nanos.saturating_add(ctx.2);
-                        if nanos >= 1_000_000_000 {
-                            nanos = 999_999_999;
-                        }
-                    } else {
-                        // New timestamp; reset the counter and record values.
-                        ctx.0 = seconds;
-                        ctx.1 = nanos;
-                        ctx.2 = 0;
-                    }
-                }
+                let ts = match self.v7_context.as_ref() {
+                    Some(ctx) => uuid::Timestamp::from_unix(ctx, seconds, nanos),
+                    None => uuid::Timestamp::from_unix(uuid::NoContext, seconds, nanos),
+                };
 
-                let ts = uuid::Timestamp::from_unix(uuid::NoContext, seconds, nanos);
                 uuid::Uuid::new_v7(ts).to_string()
             }
         };
