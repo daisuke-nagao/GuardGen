@@ -96,7 +96,7 @@ impl IncludeGuardGenerator {
                 // component. Maintain a tiny local context (last timestamp + counter)
                 // to avoid collisions when multiple calls occur within the same
                 // millisecond.
-                let (mut seconds, mut nanos) = unix_time();
+                let (seconds, mut nanos) = unix_time();
 
                 if let Some(ctx) = self.v7_context.as_mut() {
                     // ctx = (last_seconds, last_nanos, counter)
