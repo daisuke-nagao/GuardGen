@@ -18,6 +18,15 @@ pub enum Language {
     C,
     Cxx,
 }
+/// Provide a `Default` implementation delegating to `new()` to satisfy clippy.
+impl Default for IncludeGuardGenerator {
+    /// Create a default `IncludeGuardGenerator`.
+    ///
+    /// @post Equivalent to `IncludeGuardGenerator::new()`.
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Enum representing line-ending styles.
 /// - `None`: Uses system default.
