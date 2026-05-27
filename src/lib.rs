@@ -45,6 +45,7 @@ pub enum LineEnding {
 ///
 /// - V7: Time-ordered UUID version 7 (preferred for ordered identifiers).
 /// - V4: Random UUID version 4.
+#[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum UuidKind {
     V7,

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-05-28
+
+### Fixed
+
+- Export `UuidKind` enum from the library API to allow wasm bindings to specify the UUID generation kind (v4 or v7).
+
 ## [2.0.0] - 2026-05-28
 
 ### Added
