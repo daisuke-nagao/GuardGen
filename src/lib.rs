@@ -66,6 +66,7 @@ pub struct IncludeGuardGenerator {
     v7_context: Option<uuid::ContextV7>,
 }
 
+#[cfg_attr(all(target_arch = "wasm32", target_os = "unknown"), wasm_bindgen)]
 impl IncludeGuardGenerator {
     /// Create a new `IncludeGuardGenerator`.
     ///
@@ -76,6 +77,10 @@ impl IncludeGuardGenerator {
     /// The generator does not store prefix/suffix/language/line ending or UUID kind;
     /// those are provided per-call to `generate` to allow callers to reuse the
     /// same context while varying parameters.
+    #[cfg_attr(
+        all(target_arch = "wasm32", target_os = "unknown"),
+        wasm_bindgen(constructor)
+    )]
     pub fn new() -> Self {
         IncludeGuardGenerator {
             v7_context: Some(uuid::ContextV7::new()),
