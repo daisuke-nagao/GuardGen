@@ -49,6 +49,24 @@ impl From<LineEnding> for guardgen_lib::LineEnding {
     }
 }
 
+/// Enum selecting the UUID version used in generated include guards.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+enum UuidVersion {
+    #[value(alias = "4")]
+    V4,
+    #[value(alias = "7")]
+    V7,
+}
+
+impl From<UuidVersion> for guardgen_lib::UuidKind {
+    fn from(val: UuidVersion) -> Self {
+        match val {
+            UuidVersion::V4 => guardgen_lib::UuidKind::V4,
+            UuidVersion::V7 => guardgen_lib::UuidKind::V7,
+        }
+    }
+}
+
 /// Command-line argument parser using `clap`.
 #[derive(Parser, Debug)]
 #[command(
@@ -110,6 +128,18 @@ struct Args {
                 Options: none (auto-detect), lf (Unix-style LF), crlf (Windows-style CRLF)."
     )]
     line_ending: LineEnding,
+
+    /// UUID version used for the include guard
+    #[arg(
+        short = 'v',
+        long = "uuid-version",
+        value_enum,
+        default_value_t = UuidVersion::V7,
+        ignore_case = true,
+        help = "Specify the UUID version for the include guard. \
+                Options: v7 (default), v4. Compact forms -v7 and -v4 are accepted."
+    )]
+    uuid_version: UuidVersion,
 }
 
 /// Main function that parses arguments and generates the include guard.
@@ -118,14 +148,13 @@ fn main() {
     let args = Args::parse();
 
     // Generate the include guard based on user input using the struct-based API.
-    // For now, default to UUID v7 generation for compatibility.
     let mut generator = guardgen_lib::IncludeGuardGenerator::new();
     let guard = generator.generate(
         args.prefix,
         args.suffix,
         args.x.into(),
         args.line_ending.into(),
-        guardgen_lib::UuidKind::V7,
+        args.uuid_version.into(),
     );
 
     if let Some(file_path) = &args.filename {
@@ -172,5 +201,34 @@ fn main() {
     } else {
         // Print the include guard to stdout if no output file is specified.
         println!("{}", guard);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::error::ErrorKind;
+
+    #[test]
+    fn default_uuid_version_is_v7() {
+        let args = Args::parse_from(["guardgen"]);
+
+        assert_eq!(args.uuid_version, UuidVersion::V7);
+    }
+
+    #[test]
+    fn parses_compact_uuid_version_flags() {
+        let args_v4 = Args::parse_from(["guardgen", "-v4"]);
+        let args_v7 = Args::parse_from(["guardgen", "-v7"]);
+
+        assert_eq!(args_v4.uuid_version, UuidVersion::V4);
+        assert_eq!(args_v7.uuid_version, UuidVersion::V7);
+    }
+
+    #[test]
+    fn rejects_repeated_uuid_version_selection() {
+        let err = Args::try_parse_from(["guardgen", "-v4", "-v7"]).unwrap_err();
+
+        assert_eq!(err.kind(), ErrorKind::ArgumentConflict);
     }
 }
